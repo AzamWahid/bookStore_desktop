@@ -10,13 +10,6 @@
         "name": "Microsoft.WindowsDesktop.App",
         "version": "6.0.0"
       }
-    ],
-    "additionalProbingPaths": [
-      "C:\\Users\\azam\\.dotnet\\store\\|arch|\\|tfm|",
-      "C:\\Users\\azam\\.nuget\\packages"
-    ],
-    "configProperties": {
-      "Microsoft.NETCore.DotNetHostPolicy.SetAppPaths": true
-    }
+    ]
   }
 }

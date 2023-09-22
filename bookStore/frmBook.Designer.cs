@@ -35,15 +35,15 @@
             this.dgvList = new System.Windows.Forms.DataGridView();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.textBox6 = new System.Windows.Forms.TextBox();
+            this.tbBookEdition = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
-            this.textBox5 = new System.Windows.Forms.TextBox();
+            this.tbBookDesc = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
-            this.textBox4 = new System.Windows.Forms.TextBox();
+            this.tbBookAuthor = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
-            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.tbBookName = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.tbBookID = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.btnNew = new System.Windows.Forms.Button();
             this.btnEdit = new System.Windows.Forms.Button();
@@ -99,13 +99,17 @@
             // 
             // dgvList
             // 
+            this.dgvList.AllowUserToAddRows = false;
             this.dgvList.BackgroundColor = System.Drawing.SystemColors.Control;
             this.dgvList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvList.Location = new System.Drawing.Point(6, 30);
             this.dgvList.Name = "dgvList";
+            this.dgvList.ReadOnly = true;
             this.dgvList.RowTemplate.Height = 25;
+            this.dgvList.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvList.Size = new System.Drawing.Size(470, 250);
             this.dgvList.TabIndex = 0;
+            this.dgvList.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvList_CellDoubleClick);
             // 
             // tabPage2
             // 
@@ -121,15 +125,15 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.textBox6);
+            this.groupBox1.Controls.Add(this.tbBookEdition);
             this.groupBox1.Controls.Add(this.label6);
-            this.groupBox1.Controls.Add(this.textBox5);
+            this.groupBox1.Controls.Add(this.tbBookDesc);
             this.groupBox1.Controls.Add(this.label5);
-            this.groupBox1.Controls.Add(this.textBox4);
+            this.groupBox1.Controls.Add(this.tbBookAuthor);
             this.groupBox1.Controls.Add(this.label4);
-            this.groupBox1.Controls.Add(this.textBox3);
+            this.groupBox1.Controls.Add(this.tbBookName);
             this.groupBox1.Controls.Add(this.label3);
-            this.groupBox1.Controls.Add(this.textBox2);
+            this.groupBox1.Controls.Add(this.tbBookID);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Location = new System.Drawing.Point(4, 0);
             this.groupBox1.Name = "groupBox1";
@@ -138,12 +142,12 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Detail";
             // 
-            // textBox6
+            // tbBookEdition
             // 
-            this.textBox6.Location = new System.Drawing.Point(118, 190);
-            this.textBox6.Name = "textBox6";
-            this.textBox6.Size = new System.Drawing.Size(139, 23);
-            this.textBox6.TabIndex = 13;
+            this.tbBookEdition.Location = new System.Drawing.Point(118, 190);
+            this.tbBookEdition.Name = "tbBookEdition";
+            this.tbBookEdition.Size = new System.Drawing.Size(139, 23);
+            this.tbBookEdition.TabIndex = 13;
             // 
             // label6
             // 
@@ -154,13 +158,13 @@
             this.label6.TabIndex = 12;
             this.label6.Text = "Edition :";
             // 
-            // textBox5
+            // tbBookDesc
             // 
-            this.textBox5.Location = new System.Drawing.Point(118, 119);
-            this.textBox5.Multiline = true;
-            this.textBox5.Name = "textBox5";
-            this.textBox5.Size = new System.Drawing.Size(285, 65);
-            this.textBox5.TabIndex = 11;
+            this.tbBookDesc.Location = new System.Drawing.Point(118, 119);
+            this.tbBookDesc.Multiline = true;
+            this.tbBookDesc.Name = "tbBookDesc";
+            this.tbBookDesc.Size = new System.Drawing.Size(285, 65);
+            this.tbBookDesc.TabIndex = 11;
             // 
             // label5
             // 
@@ -171,12 +175,12 @@
             this.label5.TabIndex = 10;
             this.label5.Text = "Book Description :";
             // 
-            // textBox4
+            // tbBookAuthor
             // 
-            this.textBox4.Location = new System.Drawing.Point(118, 90);
-            this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(285, 23);
-            this.textBox4.TabIndex = 9;
+            this.tbBookAuthor.Location = new System.Drawing.Point(118, 90);
+            this.tbBookAuthor.Name = "tbBookAuthor";
+            this.tbBookAuthor.Size = new System.Drawing.Size(285, 23);
+            this.tbBookAuthor.TabIndex = 9;
             // 
             // label4
             // 
@@ -187,12 +191,12 @@
             this.label4.TabIndex = 8;
             this.label4.Text = "Book Author :";
             // 
-            // textBox3
+            // tbBookName
             // 
-            this.textBox3.Location = new System.Drawing.Point(118, 61);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(285, 23);
-            this.textBox3.TabIndex = 7;
+            this.tbBookName.Location = new System.Drawing.Point(118, 61);
+            this.tbBookName.Name = "tbBookName";
+            this.tbBookName.Size = new System.Drawing.Size(285, 23);
+            this.tbBookName.TabIndex = 7;
             // 
             // label3
             // 
@@ -203,12 +207,13 @@
             this.label3.TabIndex = 6;
             this.label3.Text = "Book Name :";
             // 
-            // textBox2
+            // tbBookID
             // 
-            this.textBox2.Location = new System.Drawing.Point(118, 32);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(285, 23);
-            this.textBox2.TabIndex = 5;
+            this.tbBookID.Location = new System.Drawing.Point(118, 32);
+            this.tbBookID.Name = "tbBookID";
+            this.tbBookID.Size = new System.Drawing.Size(285, 23);
+            this.tbBookID.TabIndex = 5;
+            this.tbBookID.Validated += new System.EventHandler(this.tbBookID_Validated);
             // 
             // label2
             // 
@@ -247,6 +252,7 @@
             this.btnSave.TabIndex = 3;
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // btnUpdate
             // 
@@ -256,6 +262,7 @@
             this.btnUpdate.TabIndex = 4;
             this.btnUpdate.Text = "Update";
             this.btnUpdate.UseVisualStyleBackColor = true;
+            this.btnUpdate.Click += new System.EventHandler(this.btnUpdate_Click);
             // 
             // btnDelete
             // 
@@ -265,6 +272,7 @@
             this.btnDelete.TabIndex = 5;
             this.btnDelete.Text = "Delete";
             this.btnDelete.UseVisualStyleBackColor = true;
+            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
             // 
             // frmBook
             // 
@@ -279,6 +287,7 @@
             this.Controls.Add(this.tabControl1);
             this.Name = "frmBook";
             this.Text = "Book";
+            this.Activated += new System.EventHandler(this.frmBook_Activated);
             this.Load += new System.EventHandler(this.frmBook_Load);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
@@ -305,15 +314,15 @@
         private Button btnDelete;
         private Label label1;
         private GroupBox groupBox1;
-        private TextBox textBox6;
+        private TextBox tbBookEdition;
         private Label label6;
-        private TextBox textBox5;
+        private TextBox tbBookDesc;
         private Label label5;
-        private TextBox textBox4;
+        private TextBox tbBookAuthor;
         private Label label4;
-        private TextBox textBox3;
+        private TextBox tbBookName;
         private Label label3;
-        private TextBox textBox2;
+        private TextBox tbBookID;
         private Label label2;
     }
 }

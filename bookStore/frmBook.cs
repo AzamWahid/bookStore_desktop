@@ -182,5 +182,29 @@ namespace bookStore
         {
             setlistGrid();
         }
+
+        private void tbSearch_KeyDown(object sender, KeyEventArgs e)
+        {
+            //DataTable dt_search = new DataTable();
+            //using (SqlCommand cmd = new SqlCommand("sp_SearchBook", con))
+            //{
+            //    cmd.CommandType = CommandType.StoredProcedure;
+
+            //    // Assuming that "tbBookName.Text" is the value you want to pass as a parameter.
+            //    cmd.Parameters.Add("@bookName", SqlDbType.VarChar).Value =  tbSearch.Text;
+            //    cmd.ExecuteNonQuery();
+            //    SqlDataAdapter sda = new SqlDataAdapter(cmd);
+            //    sda.Fill(dt_search);
+            //    dgvList.DataSource = dt_search;
+            //}
+            SqlCommand cmd = new SqlCommand("exec sp_SearchBook '" + tbSearch.Text + "' ", con);
+            SqlDataAdapter sda = new SqlDataAdapter(cmd);
+            DataTable dt_search = new DataTable();
+            sda.Fill(dt_search);
+            dgvList.DataSource = dt_search;
+            //string pSearchField = dt_Get0402.Columns[cboSearch.SelectedIndex + 3].ColumnName;
+            //dt_Get0402 = cls0402.Search0402(pSearchField, tbSearch.Text);
+            //dgvList.DataSource = dt_Get0402;
+        }
     }
 }

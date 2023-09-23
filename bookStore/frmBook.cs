@@ -10,6 +10,7 @@ namespace bookStore
         int pBkID = 0;
         string entryMode = "";
         string PreviousBOOKID = "";
+         DataTable dt_list = new DataTable();
         public frmBook()
         {
             InitializeComponent();
@@ -21,22 +22,36 @@ namespace bookStore
         private void frmBook_Load(object sender, EventArgs e)
         {
             con.Open();
-            setlistGrid();
+            getListData();
+          //  setGrid();
         }
 
-        private void setlistGrid()
+        private void getListData()
         {
+            //if (dgvList.Rows.Count > 0) { dgvList.Rows.Clear(); }
+            dt_list.Clear();
             SqlCommand cmd = new SqlCommand("exec sp_getBookList", con);
             SqlDataAdapter sda = new SqlDataAdapter(cmd);
-            DataTable dt_list = new DataTable();
             sda.Fill(dt_list);
             dgvList.DataSource = dt_list;
-
+            setGrid();
+        }
+        private void setGrid()
+        {
             dgvList.Columns["book_ID"].HeaderText = "Book ID";
             dgvList.Columns["book_ID"].Width = 50;
 
             dgvList.Columns["book_Name"].HeaderText = "Book Name";
             dgvList.Columns["book_Name"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+
+            dgvList.Columns["book_Author"].HeaderText = "Book Author";
+            dgvList.Columns["book_Author"].Width = 120;
+
+            dgvList.Columns["book_Description"].HeaderText = "Book Description";
+            dgvList.Columns["book_Description"].Width = 150;
+
+            dgvList.Columns["edition"].HeaderText = "Edition";
+            dgvList.Columns["edition"].Width = 50; 
         }
         private void btnNew_Click(object sender, EventArgs e)
         {
@@ -86,7 +101,7 @@ namespace bookStore
                 btnUpdate.Enabled = true;
 
                 pBkID = int.Parse(dt_Edit.Rows[0]["BK_ID"].ToString());
-                tbBookID.Text = dt_Edit.Rows[0]["book_ID"].ToString();
+                tbBookID.Text = dt_Edit.Rows[0]["book_ID"].ToString().Trim();
                 tbBookName.Text = dt_Edit.Rows[0]["book_Name"].ToString();
                 tbBookAuthor.Text = dt_Edit.Rows[0]["book_Author"].ToString();
                 tbBookDesc.Text = dt_Edit.Rows[0]["book_Description"].ToString();
@@ -127,17 +142,18 @@ namespace bookStore
         {
             if (saveCheck())
             {
-                SqlCommand cmd = new SqlCommand("exec sp_SaveBook  'Add','" + int.Parse("0") + "','" + tbBookID.Text + "','" + tbBookName.Text + "','" + tbBookAuthor.Text + "','" + tbBookDesc.Text + "','" + int.Parse(tbBookEdition.Text) + "' ", con);
+                SqlCommand cmd = new SqlCommand("exec sp_SaveBook  'Add','" + int.Parse("0") + "','" + tbBookID.Text.Trim() + "','" + tbBookName.Text + "','" + tbBookAuthor.Text + "','" + tbBookDesc.Text + "','" + int.Parse(tbBookEdition.Text) + "' ", con);
                 cmd.ExecuteNonQuery();
                 MessageBox.Show("Record Saved Successfully", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 tabControl1.SelectedIndex = 0;
+               getListData();
             }
         }
         private void btnUpdate_Click(object sender, EventArgs e)
         {
             if (saveCheck())
             {
-                SqlCommand cmd = new SqlCommand("exec sp_SaveBook  'Update','" + pBkID + "','" + tbBookID.Text + "','" + tbBookName.Text + "','" + tbBookAuthor.Text + "','" + tbBookDesc.Text + "','" + int.Parse(tbBookEdition.Text) + "' ", con);
+                SqlCommand cmd = new SqlCommand("exec sp_SaveBook  'Update','" + pBkID + "','" + tbBookID.Text.Trim() + "','" + tbBookName.Text + "','" + tbBookAuthor.Text + "','" + tbBookDesc.Text + "','" + int.Parse(tbBookEdition.Text) + "' ", con);
                 cmd.ExecuteNonQuery();
                 MessageBox.Show("Record Updated Successfully", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 tabControl1.SelectedIndex = 0;
@@ -146,13 +162,22 @@ namespace bookStore
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
-            SqlCommand cmd = new SqlCommand("exec sp_DeleteBook '" + dgvList.CurrentRow.Cells["book_ID"].Value.ToString().Trim() + "'", con);
-            cmd.ExecuteNonQuery();
-            MessageBox.Show("Record Delete Successfully", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (MessageBox.Show("Are you sure you want to delete this Book?", "Delete Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                string bookID = dgvList.CurrentRow.Cells["book_ID"].Value.ToString().Trim();
+                SqlCommand cmd = new SqlCommand("exec sp_DeleteBook '" + bookID + "'", con);
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Record Delete Successfully", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                getListData();
+            }
+            else 
+            {
+                MessageBox.Show("Delete Cancel", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
         private void tabPage1_Enter(object sender, EventArgs e)
         {
-            setlistGrid();
+           // getListData();
             this.Text = "BOOK LIST";
             btnSave.Enabled = false;
             btnUpdate.Enabled = false;
@@ -180,31 +205,54 @@ namespace bookStore
 
         private void frmBook_Activated(object sender, EventArgs e)
         {
-            setlistGrid();
+          //  getListData();
         }
 
         private void tbSearch_KeyDown(object sender, KeyEventArgs e)
         {
-            //DataTable dt_search = new DataTable();
-            //using (SqlCommand cmd = new SqlCommand("sp_SearchBook", con))
-            //{
-            //    cmd.CommandType = CommandType.StoredProcedure;
+         DataView dv;
+        //DataTable dt_search = new DataTable();
+        //using (SqlCommand cmd = new SqlCommand("sp_SearchBook", con))
+        //{
+        //    cmd.CommandType = CommandType.StoredProcedure;
 
-            //    // Assuming that "tbBookName.Text" is the value you want to pass as a parameter.
-            //    cmd.Parameters.Add("@bookName", SqlDbType.VarChar).Value =  tbSearch.Text;
-            //    cmd.ExecuteNonQuery();
-            //    SqlDataAdapter sda = new SqlDataAdapter(cmd);
-            //    sda.Fill(dt_search);
+        //    // Assuming that "tbBookName.Text" is the value you want to pass as a parameter.
+        //    cmd.Parameters.Add("@bookName", SqlDbType.VarChar).Value =  tbSearch.Text;
+        //    cmd.ExecuteNonQuery();
+        //    SqlDataAdapter sda = new SqlDataAdapter(cmd);
+        //    sda.Fill(dt_search);
+        //    dgvList.DataSource = dt_search;
+        //}
+        //// SqlCommand cmd = new SqlCommand("exec sp_SearchBook '" + tbSearch.Text + "' ", con);
+        //SqlCommand cmd = new SqlCommand("exec sp_getBookList", con);
+        //    SqlDataAdapter sda = new SqlDataAdapter(cmd);
+        //    DataTable dt_search = new DataTable();
+        //    sda.Fill(dt_search);
+            dv = new DataView(dt_list);
             //    dgvList.DataSource = dt_search;
-            //}
-            SqlCommand cmd = new SqlCommand("exec sp_SearchBook '" + tbSearch.Text + "' ", con);
-            SqlDataAdapter sda = new SqlDataAdapter(cmd);
-            DataTable dt_search = new DataTable();
-            sda.Fill(dt_search);
-            dgvList.DataSource = dt_search;
             //string pSearchField = dt_Get0402.Columns[cboSearch.SelectedIndex + 3].ColumnName;
             //dt_Get0402 = cls0402.Search0402(pSearchField, tbSearch.Text);
             //dgvList.DataSource = dt_Get0402;
+
+            string searchTerm = tbSearch.Text.ToLower(); // Convert search term to lowercase for case-insensitive search
+
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                // If the search term is empty or contains only whitespace, show all rows
+                dgvList.DataSource = dt_list;
+            }
+            else
+            {
+                // Use RowFilter to filter rows that contain the search term in any of the four columns
+                dv.RowFilter = $"book_ID LIKE '%{searchTerm}%' " +
+                               $"OR book_Name LIKE '%{searchTerm}%'"+
+                               $"OR book_Author LIKE '%{searchTerm}%'"+
+                               $"OR book_Description LIKE '%{searchTerm}%'"+
+                               $"OR Convert(edition , 'System.String') LIKE '%{searchTerm}%'";
+
+                // Update the DataGridView to display the filtered rows
+                dgvList.DataSource = dv;
+            }
         }
     }
 }

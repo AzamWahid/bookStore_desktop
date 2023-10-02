@@ -11,7 +11,7 @@ namespace bookStore
     {
         string entryMode = "";
         string PreviousBOOKID = "";
-         DataTable dt_list = new DataTable();
+        DataTable dt_list = new DataTable();
 
         private readonly ClsBook bookManager;
 
@@ -49,6 +49,8 @@ namespace bookStore
 
             dgvList.Columns["edition"].HeaderText = "Edition";
             dgvList.Columns["edition"].Width = 50;
+
+
         }
         private void btnNew_Click(object sender, EventArgs e)
         {
@@ -59,7 +61,9 @@ namespace bookStore
             tbBookEdition.Text = "0";
             entryMode = "New";
             btnSave.Enabled = true;
+            btnSave.BackColor = Color.LightSeaGreen;
             btnUpdate.Enabled = false;
+            btnUpdate.BackColor = Color.LightGray;
             this.Text = "BOOK (NEW)";
         }
 
@@ -68,21 +72,7 @@ namespace bookStore
             getEdit(dgvList.CurrentRow.Cells["book_ID"].Value.ToString().Trim());
             tbBookID.Focus();
             entryMode = "Edit";
-            btnSave.Enabled = false;
-            btnUpdate.Enabled = true;
-        }
-        private void dgvList_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
-        {
-            getEdit(dgvList.CurrentRow.Cells["book_ID"].Value.ToString().Trim());
-        }
-        private void tbBookID_Validated(object sender, EventArgs e)
-        {
-            if ((tbBookID.Text != null) && (PreviousBOOKID != tbBookID.Text))
-            {
-                PreviousBOOKID = tbBookID.Text;
-                getEdit(tbBookID.Text.Trim());
-                tbBookID.Text = PreviousBOOKID;
-            }
+
         }
         private void getEdit(string BookID)
         {
@@ -92,8 +82,12 @@ namespace bookStore
             {
                 this.Text = "BOOK (EDIT)";
                 entryMode = "Edit";
+                //btnSave.Enabled = false;
+                //btnUpdate.Enabled = true;
                 btnSave.Enabled = false;
+                btnSave.BackColor = Color.LightGray;
                 btnUpdate.Enabled = true;
+                btnUpdate.BackColor = Color.SteelBlue;
 
                 tbBookID.Text = book.BookID;
                 tbBookName.Text = book.BookName;
@@ -113,21 +107,25 @@ namespace bookStore
             if (tbBookID.Text == "")
             {
                 MessageBox.Show("Book ID should not be empty", "Stop", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                tbBookID.Focus();
                 return false;
             }
             if (tbBookName.Text == "")
             {
                 MessageBox.Show("Book Name should not be empty", "Stop", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                tbBookName.Focus();
                 return false;
             }
             if (tbBookDesc.Text == "")
             {
                 MessageBox.Show("Book Description should not be empty", "Stop", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                tbBookDesc.Focus();
                 return false;
             }
             if (tbBookAuthor.Text == "")
             {
                 MessageBox.Show("Book Author should not be empty", "Stop", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                tbBookAuthor.Focus();
                 return false;
             }
             return true;
@@ -148,7 +146,8 @@ namespace bookStore
                 bookManager.AddBook(newBook);
 
                 MessageBox.Show("Record Saved Successfully", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                getListData();
+                btnNew_Click(sender, e);
+                //  getListData();
             }
         }
         private void btnUpdate_Click(object sender, EventArgs e)
@@ -173,45 +172,68 @@ namespace bookStore
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
+            string bookID = dgvList.CurrentRow.Cells["book_ID"].Value.ToString().Trim();
 
-            if (MessageBox.Show("Are you sure you want to delete this Book?", "Delete Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            if (MessageBox.Show("Are you sure you want to delete "+ dgvList.CurrentRow.Cells["book_Name"].Value.ToString().Trim() + " Book?", "Delete Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
-                string bookID = dgvList.CurrentRow.Cells["book_ID"].Value.ToString().Trim();
                 bookManager.DeleteBook(bookID);
                 MessageBox.Show("Record Delete Successfully", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                getListData();
+                btnNew_Click(sender,e);
+                // getListData();
             }
             else
             {
                 MessageBox.Show("Delete Cancel", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
-   
-
-   
         private void tbSearch_KeyDown(object sender, KeyEventArgs e)
         {
-         DataView dv;
-      
-            dv = new DataView(bookManager.GetBooks());
-       
+            DataView dv;
 
-            string searchTerm = tbSearch.Text.ToLower(); 
+            dv = new DataView(bookManager.GetBooks());
+
+
+            string searchTerm = tbSearch.Text.ToLower();
 
             if (string.IsNullOrWhiteSpace(searchTerm))
             {
-              
+
                 dgvList.DataSource = bookManager.GetBooks();
             }
             else
             {
                 dv.RowFilter = $"book_ID LIKE '%{searchTerm}%' " +
-                               $"OR book_Name LIKE '%{searchTerm}%'"+
-                               $"OR book_Author LIKE '%{searchTerm}%'"+
-                               $"OR book_Description LIKE '%{searchTerm}%'"+
+                               $"OR book_Name LIKE '%{searchTerm}%'" +
+                               $"OR book_Author LIKE '%{searchTerm}%'" +
+                               $"OR book_Description LIKE '%{searchTerm}%'" +
                                $"OR Convert(edition , 'System.String') LIKE '%{searchTerm}%'";
 
                 dgvList.DataSource = dv;
+            }
+        }
+        private void dgvList_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            getEdit(dgvList.CurrentRow.Cells["book_ID"].Value.ToString().Trim());
+        }
+        private void tbBookID_Validated(object sender, EventArgs e)
+        {
+            if ((tbBookID.Text != null) && (PreviousBOOKID != tbBookID.Text))
+            {
+                PreviousBOOKID = tbBookID.Text;
+                getEdit(tbBookID.Text.Trim());
+                tbBookID.Text = PreviousBOOKID;
+            }
+        }
+        private void frmBook_Activated(object sender, EventArgs e)
+        {
+            getListData();
+        }
+
+        private void tbBookEdition_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
             }
         }
     }

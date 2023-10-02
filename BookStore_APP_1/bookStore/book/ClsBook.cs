@@ -13,7 +13,7 @@ namespace bookStore
         public ClsBook()
         {
             // Load the connection string from app.config
-            string connectionString = ConfigurationManager.ConnectionStrings["Connection_String"].ConnectionString;
+            string connectionString = clsGeneral.getConnectionString();
             connection = new SqlConnection(connectionString);
         }
 

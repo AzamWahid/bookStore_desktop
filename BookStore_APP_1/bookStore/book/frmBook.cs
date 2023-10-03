@@ -1,27 +1,18 @@
-using bookStore.book;
-using System.Configuration;
-using System.Configuration.Provider;
 using System.Data;
-using System.Data.SqlClient;
-using System.Net;
 
 namespace bookStore
 {
     public partial class frmBook : Form
     {
-        string entryMode = "";
-        string PreviousBOOKID = "";
+        string previousBookId = "";
+       
+        ClsBook Book = new ClsBook();
         DataTable dt_list = new DataTable();
-
-        private readonly ClsBook bookManager;
-
+        List<ClsBook> BookList = new List<ClsBook>();
         public frmBook()
         {
             InitializeComponent();
-            bookManager = new ClsBook();
         }
-
-
         private void frmBook_Load(object sender, EventArgs e)
         {
             getListData();
@@ -29,28 +20,26 @@ namespace bookStore
 
         private void getListData()
         {
-
-            dgvList.DataSource = bookManager.GetBooks();
+            BookList = Book.GetBooks();
+            dgvList.DataSource = BookList;
             setGrid();
         }
         private void setGrid()
         {
-            dgvList.Columns["book_ID"].HeaderText = "Book ID";
-            dgvList.Columns["book_ID"].Width = 50;
+            dgvList.Columns["BookID"].HeaderText = "Book ID";
+            dgvList.Columns["BookID"].Width = 50;
 
-            dgvList.Columns["book_Name"].HeaderText = "Book Name";
-            dgvList.Columns["book_Name"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            dgvList.Columns["BookName"].HeaderText = "Book Name";
+            dgvList.Columns["BookName"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
 
-            dgvList.Columns["book_Author"].HeaderText = "Book Author";
-            dgvList.Columns["book_Author"].Width = 80;
+            dgvList.Columns["Author"].HeaderText = "Book Author";
+            dgvList.Columns["Author"].Width = 80;
 
-            dgvList.Columns["book_Description"].HeaderText = "Book Description";
-            dgvList.Columns["book_Description"].Width = 80;
+            dgvList.Columns["Description"].HeaderText = "Book Description";
+            dgvList.Columns["Description"].Width = 80;
 
-            dgvList.Columns["edition"].HeaderText = "Edition";
-            dgvList.Columns["edition"].Width = 50;
-
-
+            dgvList.Columns["Edition"].HeaderText = "Edition";
+            dgvList.Columns["Edition"].Width = 50;
         }
         private void btnNew_Click(object sender, EventArgs e)
         {
@@ -59,35 +48,35 @@ namespace bookStore
             tbBookAuthor.Text = "";
             tbBookDesc.Text = "";
             tbBookEdition.Text = "0";
-            entryMode = "New";
+
             btnSave.Enabled = true;
-            btnSave.BackColor = Color.LightSeaGreen;
             btnUpdate.Enabled = false;
+
+            btnSave.BackColor = Color.LightSeaGreen;
             btnUpdate.BackColor = Color.LightGray;
             this.Text = "BOOK (NEW)";
         }
 
         private void btnEdit_Click(object sender, EventArgs e)
         {
-            getEdit(dgvList.CurrentRow.Cells["book_ID"].Value.ToString().Trim());
+            getEdit(dgvList.CurrentRow.Cells["BookID"].Value.ToString().Trim());
             tbBookID.Focus();
-            entryMode = "Edit";
 
         }
-        private void getEdit(string BookID)
+        private void getEdit(string _bookID)
         {
-            BookModel book = bookManager.GetBookById(BookID);
+            ClsBook book = new ClsBook();
+            book.BookID = _bookID;
+            book.GetBookById();
 
-            if (book != null)
+            if (!string.IsNullOrEmpty(book.BookID))
             {
                 this.Text = "BOOK (EDIT)";
-                entryMode = "Edit";
-                //btnSave.Enabled = false;
-                //btnUpdate.Enabled = true;
                 btnSave.Enabled = false;
                 btnSave.BackColor = Color.LightGray;
                 btnUpdate.Enabled = true;
                 btnUpdate.BackColor = Color.SteelBlue;
+
 
                 tbBookID.Text = book.BookID;
                 tbBookName.Text = book.BookName;
@@ -101,7 +90,83 @@ namespace bookStore
 
             }
         }
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            if (saveCheck())
+            {
+                ClsBook book = new ClsBook();
 
+                book.BookID = tbBookID.Text.Trim();
+                book.BookName = tbBookName.Text;
+                book.Author = tbBookAuthor.Text;
+                book.Description = tbBookDesc.Text;
+                book.Edition = int.Parse(tbBookEdition.Text);
+
+                book.AddBook();
+
+                MessageBox.Show("Record Saved Successfully", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                btnNew_Click(sender, e);
+            }
+        }
+        private void btnUpdate_Click(object sender, EventArgs e)
+        {
+            if (saveCheck())
+            {
+                ClsBook book = new ClsBook();
+
+                book.BookID = tbBookID.Text.Trim();
+                book.BookName = tbBookName.Text;
+                book.Author = tbBookAuthor.Text;
+                book.Description = tbBookDesc.Text;
+                book.Edition = int.Parse(tbBookEdition.Text);
+
+
+                book.UpdateBook();
+
+                MessageBox.Show("Record Update Successfully", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                getListData();
+            }
+        }
+
+        private void btnDelete_Click(object sender, EventArgs e)
+        {
+            string bookID = dgvList.CurrentRow.Cells["BookID"].Value.ToString().Trim();
+            ClsBook book = new ClsBook();
+            book.BookID = bookID;
+
+            if (MessageBox.Show("Are you sure you want to delete "+ dgvList.CurrentRow.Cells["BookName"].Value.ToString().Trim() + " Book?", "Delete Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                Book.DeleteBook();
+                MessageBox.Show("Record Delete Successfully", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                btnNew_Click(sender,e);
+            }
+            else
+            {
+                MessageBox.Show("Delete Cancel", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+        private void tbSearch_KeyDown(object sender, KeyEventArgs e)
+        {
+           
+            string searchTerm = tbSearch.Text.ToLower();
+
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                dgvList.DataSource = BookList;
+            }
+            else
+            {
+                var filteredList = BookList.Where(book =>
+                    book.BookID.ToLower().Contains(searchTerm) ||
+                    book.BookName.ToLower().Contains(searchTerm) ||
+                    book.Author.ToLower().Contains(searchTerm) ||
+                    book.Description.ToLower().Contains(searchTerm) ||
+                    book.Edition.ToString().Contains(searchTerm)
+                ).ToList();
+                dgvList.DataSource = filteredList;
+            }
+        }
+        //-------------------------------------------------SAVE CHECK-------------------------------------------------------------------------
         private bool saveCheck()
         {
             if (tbBookID.Text == "")
@@ -130,104 +195,29 @@ namespace bookStore
             }
             return true;
         }
-        private void btnSave_Click(object sender, EventArgs e)
-        {
-            if (saveCheck())
-            {
-                BookModel newBook = new BookModel
-                {
-                    BookID = tbBookID.Text.Trim(),
-                    BookName = tbBookName.Text,
-                    Author = tbBookAuthor.Text,
-                    Description = tbBookDesc.Text,
-                    Edition = int.Parse(tbBookEdition.Text)
-                };
-
-                bookManager.AddBook(newBook);
-
-                MessageBox.Show("Record Saved Successfully", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                btnNew_Click(sender, e);
-                //  getListData();
-            }
-        }
-        private void btnUpdate_Click(object sender, EventArgs e)
-        {
-            if (saveCheck())
-            {
-                BookModel newBook = new BookModel
-                {
-                    BookID = tbBookID.Text.Trim(),
-                    BookName = tbBookName.Text,
-                    Author = tbBookAuthor.Text,
-                    Description = tbBookDesc.Text,
-                    Edition = int.Parse(tbBookEdition.Text)
-                };
-
-                bookManager.UpdateBook(newBook);
-
-                MessageBox.Show("Record Update Successfully", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                getListData();
-            }
-        }
-
-        private void btnDelete_Click(object sender, EventArgs e)
-        {
-            string bookID = dgvList.CurrentRow.Cells["book_ID"].Value.ToString().Trim();
-
-            if (MessageBox.Show("Are you sure you want to delete "+ dgvList.CurrentRow.Cells["book_Name"].Value.ToString().Trim() + " Book?", "Delete Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-            {
-                bookManager.DeleteBook(bookID);
-                MessageBox.Show("Record Delete Successfully", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                btnNew_Click(sender,e);
-                // getListData();
-            }
-            else
-            {
-                MessageBox.Show("Delete Cancel", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
-        private void tbSearch_KeyDown(object sender, KeyEventArgs e)
-        {
-            DataView dv;
-
-            dv = new DataView(bookManager.GetBooks());
-
-
-            string searchTerm = tbSearch.Text.ToLower();
-
-            if (string.IsNullOrWhiteSpace(searchTerm))
-            {
-
-                dgvList.DataSource = bookManager.GetBooks();
-            }
-            else
-            {
-                dv.RowFilter = $"book_ID LIKE '%{searchTerm}%' " +
-                               $"OR book_Name LIKE '%{searchTerm}%'" +
-                               $"OR book_Author LIKE '%{searchTerm}%'" +
-                               $"OR book_Description LIKE '%{searchTerm}%'" +
-                               $"OR Convert(edition , 'System.String') LIKE '%{searchTerm}%'";
-
-                dgvList.DataSource = dv;
-            }
-        }
+        //-------------------------------------------------GRID DOUBLE CLICK EDIT-------------------------------------------------------------------------
         private void dgvList_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            getEdit(dgvList.CurrentRow.Cells["book_ID"].Value.ToString().Trim());
+            getEdit(dgvList.CurrentRow.Cells["BookID"].Value.ToString().Trim());
         }
+
+        //-------------------------------------------------BOOK ID TEXTBOX VALIDATION-------------------------------------------------------------------------
         private void tbBookID_Validated(object sender, EventArgs e)
         {
-            if ((tbBookID.Text != null) && (PreviousBOOKID != tbBookID.Text))
+            if ((tbBookID.Text != null) && (previousBookId != tbBookID.Text))
             {
-                PreviousBOOKID = tbBookID.Text;
+                previousBookId = tbBookID.Text;
                 getEdit(tbBookID.Text.Trim());
-                tbBookID.Text = PreviousBOOKID;
+                tbBookID.Text = previousBookId;
             }
         }
+        //-------------------------------------------------FOCUS ON FORM FORM REFRESH-------------------------------------------------------------------------
         private void frmBook_Activated(object sender, EventArgs e)
         {
             getListData();
         }
+
+        //-------------------------------------------------BOOK EDITION NUMERIC ALLOW ONLY-------------------------------------------------------------------------
 
         private void tbBookEdition_KeyPress(object sender, KeyPressEventArgs e)
         {

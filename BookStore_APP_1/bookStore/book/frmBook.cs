@@ -5,8 +5,8 @@ namespace bookStore
     public partial class frmBook : Form
     {
         string previousBookId = "";
-       
-        ClsBook Book = new ClsBook();
+
+        //ClsBook Book = new ClsBook();
         DataTable dt_list = new DataTable();
         List<ClsBook> BookList = new List<ClsBook>();
         public frmBook()
@@ -16,11 +16,13 @@ namespace bookStore
         private void frmBook_Load(object sender, EventArgs e)
         {
             getListData();
+            btnNew_Click(sender,e);
         }
 
         private void getListData()
         {
-            BookList = Book.GetBooks();
+            ClsBook book = new ClsBook();
+            BookList = book.GetBooks();
             dgvList.DataSource = BookList;
             setGrid();
         }
@@ -59,7 +61,10 @@ namespace bookStore
 
         private void btnEdit_Click(object sender, EventArgs e)
         {
-            getEdit(dgvList.CurrentRow.Cells["BookID"].Value.ToString().Trim());
+            if (dgvList.Rows.Count > 0)
+            {
+                getEdit(dgvList.CurrentRow.Cells["BookID"].Value.ToString().Trim());
+            }
             tbBookID.Focus();
 
         }
@@ -68,7 +73,6 @@ namespace bookStore
             ClsBook book = new ClsBook();
             book.BookID = _bookID;
             book.GetBookById();
-
             if (!string.IsNullOrEmpty(book.BookID))
             {
                 this.Text = "BOOK (EDIT)";
@@ -130,24 +134,28 @@ namespace bookStore
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
-            string bookID = dgvList.CurrentRow.Cells["BookID"].Value.ToString().Trim();
-            ClsBook book = new ClsBook();
-            book.BookID = bookID;
+            if (dgvList.Rows.Count > 0)
+            {
+                string bookID = dgvList.CurrentRow.Cells["BookID"].Value.ToString().Trim();
 
-            if (MessageBox.Show("Are you sure you want to delete "+ dgvList.CurrentRow.Cells["BookName"].Value.ToString().Trim() + " Book?", "Delete Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-            {
-                Book.DeleteBook();
-                MessageBox.Show("Record Delete Successfully", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                btnNew_Click(sender,e);
-            }
-            else
-            {
-                MessageBox.Show("Delete Cancel", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ClsBook book = new ClsBook();
+                book.BookID = bookID;
+
+                if (MessageBox.Show("Are you sure you want to delete " + dgvList.CurrentRow.Cells["BookName"].Value.ToString().Trim() + " Book?", "Delete Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    book.DeleteBook();
+                    MessageBox.Show("Record Delete Successfully", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    btnNew_Click(sender, e);
+                }
+                else
+                {
+                    MessageBox.Show("Delete Cancel", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
         }
         private void tbSearch_KeyDown(object sender, KeyEventArgs e)
         {
-           
+
             string searchTerm = tbSearch.Text.ToLower();
 
             if (string.IsNullOrWhiteSpace(searchTerm))
@@ -198,7 +206,10 @@ namespace bookStore
         //-------------------------------------------------GRID DOUBLE CLICK EDIT-------------------------------------------------------------------------
         private void dgvList_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            getEdit(dgvList.CurrentRow.Cells["BookID"].Value.ToString().Trim());
+            if (dgvList.Rows.Count > 0)
+            {
+                getEdit(dgvList.CurrentRow.Cells["BookID"].Value.ToString().Trim());
+            }
         }
 
         //-------------------------------------------------BOOK ID TEXTBOX VALIDATION-------------------------------------------------------------------------

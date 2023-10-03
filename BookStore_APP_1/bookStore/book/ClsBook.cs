@@ -21,6 +21,7 @@ namespace bookStore
 
         public List<ClsBook> GetBooks()
         {
+
             List<ClsBook> bookList = new List<ClsBook>();
             SqlCommand cmd = new SqlCommand("sp_getBookList", connection);
             cmd.CommandType = CommandType.StoredProcedure;
@@ -43,6 +44,7 @@ namespace bookStore
                 }
             }
             connection.Close();
+
             return bookList;
         }
 
@@ -58,21 +60,18 @@ namespace bookStore
 
             if (reader != null && reader.HasRows)
             {
-                //while (reader.Read())
-                //{
                 reader.Read();
                 this.BookID = reader["book_ID"].ToString().Trim();
                 this.BookName = reader["book_Name"].ToString();
                 this.Author = reader["book_Author"].ToString();
                 this.Description = reader["book_Description"].ToString();
                 this.Edition = Convert.ToInt32(reader["edition"]);
-                //}
             }
-
+            else
+            {
+                this.BookID = "";
+            }
             connection.Close();
-
-            //return book;
-
         }
 
         public void AddBook()

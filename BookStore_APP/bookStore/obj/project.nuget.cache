@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "yo/K3wCQI8t5tPXxnB0k7Lk5ksKGYi46o2iTHGKLJ3nYPDSelpdr3/+TzxMezONspT+IY23FVQmHloXG1y45Aw==",
+  "dgSpecHash": "VXXBlU0Qne0HgOiT2nyjx9xEXom6MovShs3jD/BeHn1I7+vDQzaxUJXrNaLaWAeymMpgVSnipBMDBabdx41WcA==",
   "success": true,
-  "projectFilePath": "H:\\Persnol\\UNI\\7th\\cs619\\Prototype\\Desktop\\bookStore\\bookStore.csproj",
+  "projectFilePath": "H:\\Persnol\\UNI\\7th\\cs619\\Prototype\\BookStore_APP\\bookStore\\bookStore.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\azam\\.nuget\\packages\\documentformat.openxml\\2.20.0\\documentformat.openxml.2.20.0.nupkg.sha512",
     "C:\\Users\\azam\\.nuget\\packages\\microsoft.netcore.platforms\\3.1.0\\microsoft.netcore.platforms.3.1.0.nupkg.sha512",
     "C:\\Users\\azam\\.nuget\\packages\\microsoft.win32.registry\\4.7.0\\microsoft.win32.registry.4.7.0.nupkg.sha512",
     "C:\\Users\\azam\\.nuget\\packages\\runtime.native.system.data.sqlclient.sni\\4.7.0\\runtime.native.system.data.sqlclient.sni.4.7.0.nupkg.sha512",
@@ -11,6 +12,7 @@
     "C:\\Users\\azam\\.nuget\\packages\\runtime.win-x64.runtime.native.system.data.sqlclient.sni\\4.4.0\\runtime.win-x64.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",
     "C:\\Users\\azam\\.nuget\\packages\\runtime.win-x86.runtime.native.system.data.sqlclient.sni\\4.4.0\\runtime.win-x86.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",
     "C:\\Users\\azam\\.nuget\\packages\\system.data.sqlclient\\4.8.5\\system.data.sqlclient.4.8.5.nupkg.sha512",
+    "C:\\Users\\azam\\.nuget\\packages\\system.io.packaging\\4.7.0\\system.io.packaging.4.7.0.nupkg.sha512",
     "C:\\Users\\azam\\.nuget\\packages\\system.security.accesscontrol\\4.7.0\\system.security.accesscontrol.4.7.0.nupkg.sha512",
     "C:\\Users\\azam\\.nuget\\packages\\system.security.principal.windows\\4.7.0\\system.security.principal.windows.4.7.0.nupkg.sha512"
   ],

@@ -1,109 +1,123 @@
-﻿using bookStore.book;
-using System;
-using System.Configuration;
-using System.Data;
+﻿using System.Data;
 using System.Data.SqlClient;
 
 namespace bookStore
 {
     public class ClsBook
     {
+        public string? BookID { get; set; }
+        public string? BookName { get; set; }
+        public string? Author { get; set; }
+        public string? Description { get; set; }
+        public int Edition { get; set; }
+
         private readonly SqlConnection connection;
 
         public ClsBook()
         {
-            // Load the connection string from app.config
-            string connectionString = ConfigurationManager.ConnectionStrings["Connection_String"].ConnectionString;
+            string connectionString = clsGeneral.getConnectionString();
             connection = new SqlConnection(connectionString);
         }
 
-        public DataTable GetBooks()
+        public List<ClsBook> GetBooks()
         {
-            using (SqlCommand cmd = new SqlCommand("sp_getBookList", connection))
+
+            List<ClsBook> bookList = new List<ClsBook>();
+            SqlCommand cmd = new SqlCommand("sp_getBookList", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            connection.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+
+            if (reader != null)
             {
-                cmd.CommandType = CommandType.StoredProcedure;
-                SqlDataAdapter sda = new SqlDataAdapter(cmd);
-                DataTable dt = new DataTable();
-                sda.Fill(dt);
-                return dt;
-            }
-        }
-        public BookModel GetBookById(string bookID)
-        {
-            using (SqlCommand cmd = new SqlCommand("sp_getBookEdit", connection))
-            {
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@book_ID", bookID);
-
-                connection.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                BookModel? book = null;
-
-                if (reader.Read())
+                while (reader.Read())
                 {
-                    book = new BookModel
-                    {
-                        BookID = reader["book_ID"].ToString().Trim(),
-                        BookName = reader["book_Name"].ToString(),
-                        Author = reader["book_Author"].ToString(),
-                        Description = reader["book_Description"].ToString(),
-                        Edition = Convert.ToInt32(reader["edition"])
-                    };
+                    ClsBook book = new ClsBook();
+
+                    book.BookID = reader["book_ID"].ToString().Trim();
+                    book.BookName = reader["book_Name"].ToString();
+                    book.Author = reader["book_Author"].ToString();
+                    book.Description = reader["book_Description"].ToString();
+                    book.Edition = Convert.ToInt32(reader["edition"]);
+                    bookList.Add(book);
                 }
-
-                reader.Close();
-                connection.Close();
-
-                return book;
             }
+            connection.Close();
+            return bookList;
         }
 
-        public void AddBook(BookModel book)
+        public void GetBookById()
         {
-            using (SqlCommand cmd = new SqlCommand("sp_SaveBook", connection))
-            {
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@EntryMode", "Add");
-                cmd.Parameters.AddWithValue("@book_ID", book.BookID);
-                cmd.Parameters.AddWithValue("@book_Name", book.BookName);
-                cmd.Parameters.AddWithValue("@book_Author", book.Author);
-                cmd.Parameters.AddWithValue("@book_Description", book.Description);
-                cmd.Parameters.AddWithValue("@edition", book.Edition);
+            SqlCommand cmd = new SqlCommand("sp_getBookEdit", connection);
 
-                connection.Open();
-                cmd.ExecuteNonQuery();
-                connection.Close();
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@book_ID", this.BookID);
+
+            connection.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+
+            if (reader != null && reader.HasRows)
+            {
+                reader.Read();
+                this.BookID = reader["book_ID"].ToString().Trim();
+                this.BookName = reader["book_Name"].ToString();
+                this.Author = reader["book_Author"].ToString();
+                this.Description = reader["book_Description"].ToString();
+                this.Edition = Convert.ToInt32(reader["edition"]);
             }
+            else
+            {
+                this.BookID = "";
+            }
+            connection.Close();
         }
-        public void UpdateBook(BookModel book)
-        {
-            using (SqlCommand cmd = new SqlCommand("sp_SaveBook", connection))
-            {
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@EntryMode", "Update");
-                cmd.Parameters.AddWithValue("@book_ID", book.BookID);
-                cmd.Parameters.AddWithValue("@book_Name", book.BookName);
-                cmd.Parameters.AddWithValue("@book_Author", book.Author);
-                cmd.Parameters.AddWithValue("@book_Description", book.Description);
-                cmd.Parameters.AddWithValue("@edition", book.Edition);
 
-                connection.Open();
-                cmd.ExecuteNonQuery();
-                connection.Close();
-            }
+        public void AddBook()
+        {
+            SqlCommand cmd = new SqlCommand("sp_SaveBook", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.AddWithValue("@EntryMode", "Add");
+            cmd.Parameters.AddWithValue("@book_ID", this.BookID);
+            cmd.Parameters.AddWithValue("@book_Name", this.BookName);
+            cmd.Parameters.AddWithValue("@book_Author", this.Author);
+            cmd.Parameters.AddWithValue("@book_Description", this.Description);
+            cmd.Parameters.AddWithValue("@edition", this.Edition);
+
+            connection.Open();
+            cmd.ExecuteNonQuery();
+            connection.Close();
+
         }
-        public void DeleteBook(string bookID)
+        public void UpdateBook()
         {
-            using (SqlCommand cmd = new SqlCommand("sp_DeleteBook", connection))
-            {
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@book_ID", bookID);
+            SqlCommand cmd = new SqlCommand("sp_SaveBook", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
 
-                connection.Open();
-                cmd.ExecuteNonQuery();
-                connection.Close();
-            }
+            cmd.Parameters.AddWithValue("@EntryMode", "Update");
+            cmd.Parameters.AddWithValue("@book_ID", this.BookID);
+            cmd.Parameters.AddWithValue("@book_Name", this.BookName);
+            cmd.Parameters.AddWithValue("@book_Author", this.Author);
+            cmd.Parameters.AddWithValue("@book_Description", this.Description);
+            cmd.Parameters.AddWithValue("@edition", this.Edition);
+
+            connection.Open();
+            cmd.ExecuteNonQuery();
+            connection.Close();
+        }
+        public void DeleteBook()
+        {
+
+            SqlCommand cmd = new SqlCommand("sp_DeleteBook", connection);
+
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@book_ID", this.BookID);
+
+            connection.Open();
+            cmd.ExecuteNonQuery();
+            connection.Close();
         }
     }
 }
+

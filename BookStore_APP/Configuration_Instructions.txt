@@ -1,0 +1,4 @@
+1- Kindly run the provided database creation script.
+2- Please make sure to update the connection string in the app.config file, which is located at '/bookstore/App.config,' 
+   according to SQL server address and access credentials.
+3-I've also provided the database file and a data backup, just in case the script encounters any issues.
